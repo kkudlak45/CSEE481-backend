@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.server.database.ConnectionManager;
@@ -17,9 +18,9 @@ class ExampleController {
 		return "hello world";
 	}
 	
-	@GetMapping("/hello")
-	String paramHelloWorld() {
-		return "hello world";
+	@GetMapping("/helloparam")
+	String paramHelloWorld(@RequestParam String name) {
+		return "hello " + name;
 	}
   
 	@GetMapping("/database")
