@@ -12,6 +12,7 @@ public class Account {
 	private String picture;
 	private LocalDate joinDate;
 	private LocalDate birthDate;
+	private String interests;
 	
 	public Account() {}
 	
@@ -86,7 +87,5 @@ public class Account {
 	public void setInterests(String interests) {
 		this.interests = interests;
 	}
-
-	private String interests;
 	
 }
