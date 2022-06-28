@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,8 @@ import com.backend.server.objects.Account;
  */
 @RestController
 public class AccountRestController {
+	
+	BCryptPasswordEncoder hasher = new BCryptPasswordEncoder();
 
 	/**
 	 * Creates an Account object with the supplied account JSON's name, username,
@@ -45,9 +48,11 @@ public class AccountRestController {
 		
 		try (Connection conn = ConnectionManager.getConnection();
 				PreparedStatement createAccStmt = conn.prepareStatement(query)) {
+			String hashedPassword = this.hasher.encode(account.getPassword());
+			
 			createAccStmt.setString(1, account.getName());
 			createAccStmt.setString(2, account.getUsername()); // TODO: in the DB, we should probably have a uniqueness constraint on this prop & we might want to return a response here that an acc with this user already exists
-			createAccStmt.setString(3, account.getPassword()); // TODO: hash password before storing in db
+			createAccStmt.setString(3, hashedPassword); // TODO: hash password before storing in db
 			createAccStmt.setString(4, account.getInterests());
 			createAccStmt.setString(5, account.getEmail()); // TODO: similarly to username, we probably want a uniqueness constraint here & will want a return code if an acc with this email exists
 			createAccStmt.setObject(6, account.getBirthDate());
@@ -72,17 +77,21 @@ public class AccountRestController {
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Boolean> verifyLogin(@RequestBody Account account) {
 		
-		String query = "SELECT * "
+		String query = "SELECT \"password\" "
 				+ "FROM \"Account\" "
-				+ "WHERE \"username\"=? AND \"password\"=?;";
+				+ "WHERE \"username\"=?;";
 		
 		try (Connection conn = ConnectionManager.getConnection();
 				PreparedStatement getAccStmt = conn.prepareStatement(query)) {
-			getAccStmt.setString(1, account.getUsername());
-			getAccStmt.setString(2, account.getPassword()); // TODO: hash password before checking against db
 			
+			getAccStmt.setString(1, account.getUsername());
 			ResultSet rs = getAccStmt.executeQuery();
-			return new ResponseEntity<>(rs.next(), HttpStatus.OK); // if the ResultSet contains something, return true, else return false
+			
+			rs.next();
+			String hashedPassword = rs.getString(1);
+			boolean doesMatch = this.hasher.matches(account.getPassword(), hashedPassword);
+			
+			return new ResponseEntity<>(doesMatch, HttpStatus.OK); // if the ResultSet contains something, return true, else return false
 		} catch (SQLException e) {
 			return new ResponseEntity<>(false, HttpStatus.UNPROCESSABLE_ENTITY);
 		}
