@@ -1,0 +1,63 @@
+{
+	"info": {
+		"_postman_id": "cc061c38-6f80-433a-8035-2319506834eb",
+		"name": "Capstone Backend Endpoint Examples",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Account Example",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Kryzstof Kudlak\",\n    \"email\":\"example@example.com\",\n    \"username\":\"kkudlak45\",\n    \"password\":\"somePassword\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/createAccount",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"createAccount"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify Account Example",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\":\"kkudlak45\",\n    \"password\":\"somePassword\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/verifyLogin",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"verifyLogin"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

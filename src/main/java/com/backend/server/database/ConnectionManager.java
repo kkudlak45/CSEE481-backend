@@ -21,6 +21,9 @@ public class ConnectionManager {
 	 * A .env.example is provided in the root directory to show what the .env file should look like
 	 * The database connection is static and will only be created once. After that, everything will go through this connection
 	 * 
+	 * NOTE: Connections should only be obtained in a "try with resources" block, otherwise, always be sure to close your connections.
+	 * 	"try with resources" will close connections for you, if you don't use it, you *must* manually close these
+	 * 
 	 * @return A connection to a database. 
 	 */
 	public static Connection getConnection() {

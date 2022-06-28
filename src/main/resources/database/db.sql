@@ -5,7 +5,7 @@
 -- Dumped from database version 13.4
 -- Dumped by pg_dump version 13.3
 
--- Started on 2022-06-22 10:00:22 EDT
+-- Started on 2022-06-28 10:22:45 EDT
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -223,6 +223,23 @@ ALTER TABLE public."PersonalData" ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTI
 --
 
 COPY public."Account" (username, picture, password, name, "joinDate", interests, id, email, "birthDate") FROM stdin;
+kudlkak	\N	asdf1234                                                    	kryzstof	2022-06-22	computer science	2	kkudlak45@gmail.com	2001-08-14
+kudlkak	\N	asdf1234                                                    	kryzstof	2022-06-22	computer science	3	kkudlak45@gmail.com	2001-08-14
+kudlkak	\N	asdf1234                                                    	kryzstof	2022-06-22	computer science	4	kkudlak45@gmail.com	2001-08-14
+kudlkak	\N	asdf1234                                                    	abckryzstof123	2022-06-22	computer science	5	kkudlak45@gmail.com	2001-08-14
+kkudlak45	\N	somebcrypthashedpassword                                    	Kryzstof Kudlak	2022-06-22	computers and stuff	6	example@example.com	2001-08-14
+kkudlak45	\N	somebcrypthashedpassword                                    	Kryzstof Kudlak	2022-06-22	computers and stuff	7	example@example.com	2001-08-14
+kkudlak45	\N	somebcrypthashedpassword                                    	Kryzstof Kudlak	2022-06-22	\N	8	example@example.com	2001-08-14
+kkudlak45	\N	somebcrypthashedpassword                                    	Kryzstof Kudlak	2022-06-22	\N	9	example@example.com	\N
+kkudlak45	\N	somebcrypthashedpassword                                    	Kryzstof Kudlak	2022-06-22	\N	10	example@example.com	\N
+kkudlak45	\N	somebcrypthashedpassword                                    	Kryzstof Kudlak	2022-06-22	\N	11	example@example.com	\N
+kkudlak45	\N	somebcrypthashedpassword                                    	Kryzstof Kudlak	2022-06-22	\N	12	example@example.com	\N
+kkudlak45	\N	somebcrypthashedpassword                                    	Kryzstof Kudlak	2022-06-22	\N	14	example@example.com	\N
+kkudlak45	\N	somebcrypthashedpassword                                    	Kryzstof Kudlak	2022-06-22	\N	15	example@example.com	\N
+kkudlak45	\N	somebcrypthashedpassword                                    	Kryzstof Kudlak	2022-06-22	\N	17	example@example.com	\N
+kkudlak45	\N	somebcrypthashedpassword                                    	Kryzstof Kudlak	2022-06-22	\N	19	example@example.com	\N
+kkudlak45	\N	somepassword                                                	Kryzstof Kudlak	2022-06-28	\N	21	example@example.com	\N
+kkudlak45	\N	somePassword                                                	Kryzstof Kudlak	2022-06-28	\N	22	example@example.com	\N
 \.
 
 
@@ -272,7 +289,7 @@ COPY public."PersonalData" (id, "gameType", stat, "accountId") FROM stdin;
 -- Name: Account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Account_id_seq"', 1, true);
+SELECT pg_catalog.setval('public."Account_id_seq"', 22, true);
 
 
 --
@@ -392,7 +409,7 @@ ALTER TABLE ONLY public."CurveData"
     ADD CONSTRAINT "designatedAccount" FOREIGN KEY ("accountId") REFERENCES public."Account"(id) NOT VALID;
 
 
--- Completed on 2022-06-22 10:00:23 EDT
+-- Completed on 2022-06-28 10:22:45 EDT
 
 --
 -- PostgreSQL database dump complete

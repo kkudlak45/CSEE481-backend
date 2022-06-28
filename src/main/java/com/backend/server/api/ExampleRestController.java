@@ -1,15 +1,17 @@
 package com.backend.server.api;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.server.database.ConnectionManager;
-
+/**
+ * this is just here to provide an example of what a rest controller will look like.
+ * 
+ * in addition, the hello world endpoint can be used to show that the server is running.
+ * 
+ * @author kudlakk
+ *
+ */
 @RestController
 class ExampleController {
 
@@ -21,17 +23,6 @@ class ExampleController {
 	@GetMapping("/helloparam")
 	String paramHelloWorld(@RequestParam String name) {
 		return "hello " + name;
-	}
-  
-	@GetMapping("/database")
-	String database() throws SQLException {
-		Connection conn = ConnectionManager.getConnection();
-		ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM test_table");
-		rs.next();
-		
-		conn.close();
-		
-		return rs.getInt(1) + ":" + rs.getString(2);
 	}
   
 }

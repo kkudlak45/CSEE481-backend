@@ -2,8 +2,8 @@ package com.backend.server.api;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,15 +15,23 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.server.database.ConnectionManager;
 import com.backend.server.objects.Account;
 
+/**
+ * This REST controller handles stuff relating to Accounts. So far, this REST controller establishes
+ * 	the following endpoints:
+ * 
+ * 	createAccount - can be used to insert an Account object into the DB
+ *  verifyAccount - takes a username and password combo & returns T/F if the acc exists
+ * 
+ * @author kudlakk
+ */
 @RestController
 public class AccountRestController {
 
 	/**
 	 * Creates an Account object with the supplied account JSON's name, username,
-	 * 	hashed password, interests, email, and birthdate.
+	 * 	password, interests, email, and birthdate.
 	 * 
-	 * @param account - JSON represented account, required fields are: name, username,
-	 * 	email, password hash
+	 * @param account - JSON represented account, required fields are: name, username, email, password
 	 * @return - either a success response or an error response.
 	 */
 	@PostMapping(path = "/createAccount",
@@ -38,19 +46,46 @@ public class AccountRestController {
 		try (Connection conn = ConnectionManager.getConnection();
 				PreparedStatement createAccStmt = conn.prepareStatement(query)) {
 			createAccStmt.setString(1, account.getName());
-			createAccStmt.setString(2, account.getUsername());
-			createAccStmt.setString(3, account.getPassword());
+			createAccStmt.setString(2, account.getUsername()); // TODO: in the DB, we should probably have a uniqueness constraint on this prop & we might want to return a response here that an acc with this user already exists
+			createAccStmt.setString(3, account.getPassword()); // TODO: hash password before storing in db
 			createAccStmt.setString(4, account.getInterests());
-			createAccStmt.setString(5, account.getEmail());
+			createAccStmt.setString(5, account.getEmail()); // TODO: similarly to username, we probably want a uniqueness constraint here & will want a return code if an acc with this email exists
 			createAccStmt.setObject(6, account.getBirthDate());
 			
 			createAccStmt.execute();
 		} catch (SQLException e) {
-			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 		
 		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+	
+	/**
+	 * An endpoint that checks the database to see whether an account with the supplied username and password exists
+	 * 	and returns an answer in the form of a boolean.
+	 * 
+	 * @param account - an account object containing a username and password mapping, no other mappings are required
+	 * @return ResponseEntity containing True or False if the account exists w/ this username and password (TODO: we will probably want to return the acc's ID)
+	 */
+	@PostMapping(path = "/verifyLogin",
+			consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Boolean> verifyLogin(@RequestBody Account account) {
+		
+		String query = "SELECT * "
+				+ "FROM \"Account\" "
+				+ "WHERE \"username\"=? AND \"password\"=?;";
+		
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement getAccStmt = conn.prepareStatement(query)) {
+			getAccStmt.setString(1, account.getUsername());
+			getAccStmt.setString(2, account.getPassword()); // TODO: hash password before checking against db
+			
+			ResultSet rs = getAccStmt.executeQuery();
+			return new ResponseEntity<>(rs.next(), HttpStatus.OK); // if the ResultSet contains something, return true, else return false
+		} catch (SQLException e) {
+			return new ResponseEntity<>(false, HttpStatus.UNPROCESSABLE_ENTITY);
+		}
 	}
 	
 }
