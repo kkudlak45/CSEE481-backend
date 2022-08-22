@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,7 +40,6 @@ public class AccountRestController {
 	@PostMapping(path = "/createAccount",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	@CrossOrigin(origins = "http://localhost:3000") // TODO make this configurable (this solves CORS issues)
 	ResponseEntity<HttpStatus> createAccount(@RequestBody Account account) {
 		
 		String query = "INSERT INTO \"Account\""
@@ -77,7 +75,6 @@ public class AccountRestController {
 	@PostMapping(path = "/verifyLogin",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	@CrossOrigin(origins = "http://localhost:3000") // TODO make this configurable (this solves CORS issues)
 	ResponseEntity<Boolean> verifyLogin(@RequestBody Account account) {
 		
 		String query = "SELECT \"password\" "
