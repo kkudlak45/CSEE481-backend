@@ -67,7 +67,7 @@ public class AccountRestController {
 	
 	/**
 	 * An endpoint that checks the database to see whether an account with the supplied username and password exists
-	 * 	and returns an answer in the form of a boolean.
+	 * 	and returns an answer in the form of an integer. If integer is -1, account could not be found, otherwise is the account's id
 	 * 
 	 * @param account - an account object containing a username and password mapping, no other mappings are required
 	 * @return ResponseEntity containing True or False if the account exists w/ this username and password (TODO: we will probably want to return the acc's ID)
@@ -75,9 +75,9 @@ public class AccountRestController {
 	@PostMapping(path = "/verifyLogin",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Boolean> verifyLogin(@RequestBody Account account) {
+	ResponseEntity<Integer> verifyLogin(@RequestBody Account account) {
 		
-		String query = "SELECT \"password\" "
+		String query = "SELECT \"password\", \"id\" "
 				+ "FROM \"Account\" "
 				+ "WHERE \"username\"=?;";
 		
@@ -89,11 +89,17 @@ public class AccountRestController {
 			
 			rs.next();
 			String hashedPassword = rs.getString(1);
+			int id = rs.getInt(2);
 			boolean doesMatch = this.hasher.matches(account.getPassword(), hashedPassword);
 			
-			return new ResponseEntity<>(doesMatch, HttpStatus.OK); // if the ResultSet contains something, return true, else return false
+			if (doesMatch) {
+				return new ResponseEntity<>(id, HttpStatus.OK); 
+			}
+			else {
+				return new ResponseEntity<>(-1, HttpStatus.OK);
+			}
 		} catch (SQLException e) {
-			return new ResponseEntity<>(false, HttpStatus.UNPROCESSABLE_ENTITY);
+			return new ResponseEntity<>(-1, HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
 	
