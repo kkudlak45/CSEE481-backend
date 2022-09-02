@@ -9,12 +9,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.server.database.ConnectionManager;
 import com.backend.server.objects.Account;
+import com.backend.server.utils.GeneralUtils;
 
 /**
  * This REST controller handles stuff relating to Accounts. So far, this REST controller establishes
@@ -26,9 +30,42 @@ import com.backend.server.objects.Account;
  * @author kudlakk
  */
 @RestController
+@RequestMapping("Account")
 public class AccountRestController {
 	
 	BCryptPasswordEncoder hasher = new BCryptPasswordEncoder();
+	
+	@GetMapping(path = "/{id}",
+			produces = "application/json")
+	public ResponseEntity<Account> getAccount(@PathVariable int id) {
+		
+		String query = "SELECT \"username\", \"picture\", \"name\", \"joinDate\", \"interests\", \"email\", \"birthDate\" "
+				+ "FROM \"Account\" "
+				+ "WHERE \"id\"=?;";
+		
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement getAccStmt = conn.prepareStatement(query)) {
+			
+			getAccStmt.setInt(1, id);
+			ResultSet rs = getAccStmt.executeQuery();
+			rs.next();
+			
+			Account account = new Account();
+			account.setUsername(rs.getString(1));
+			account.setPicture(rs.getString(2));
+			account.setName(rs.getString(3));
+			account.setJoinDate(GeneralUtils.toLocalDate(rs.getDate(4)));
+			account.setInterests(rs.getString(5));
+			account.setEmail(rs.getString(6));
+			account.setBirthDate(GeneralUtils.toLocalDate(rs.getDate(7)));
+			
+			return new ResponseEntity<>(account, HttpStatus.OK);
+					
+		} catch (SQLException e) {
+			System.err.println(e);
+			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+	}
 
 	/**
 	 * Creates an Account object with the supplied account JSON's name, username,
@@ -59,6 +96,7 @@ public class AccountRestController {
 			
 			createAccStmt.execute();
 		} catch (SQLException e) {
+			System.err.println(e);
 			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 		
@@ -70,7 +108,7 @@ public class AccountRestController {
 	 * 	and returns an answer in the form of an integer. If integer is -1, account could not be found, otherwise is the account's id
 	 * 
 	 * @param account - an account object containing a username and password mapping, no other mappings are required
-	 * @return ResponseEntity containing True or False if the account exists w/ this username and password (TODO: we will probably want to return the acc's ID)
+	 * @return ResponseEntity containing the account's database id to use as a session id, 
 	 */
 	@PostMapping(path = "/verifyLogin",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -99,6 +137,7 @@ public class AccountRestController {
 				return new ResponseEntity<>(-1, HttpStatus.OK);
 			}
 		} catch (SQLException e) {
+			System.err.println(e);
 			return new ResponseEntity<>(-1, HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
