@@ -74,7 +74,7 @@ public class AccountRestController {
 	 * @param account - JSON represented account, required fields are: name, username, email, password
 	 * @return - either a success response or an error response.
 	 */
-	@PostMapping(path = "/createAccount",
+	@PostMapping(
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<HttpStatus> createAccount(@RequestBody Account account) {
