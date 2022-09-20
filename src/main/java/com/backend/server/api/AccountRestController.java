@@ -30,7 +30,7 @@ import com.backend.server.utils.GeneralUtils;
  * @author kudlakk
  */
 @RestController
-@RequestMapping("Account")
+@RequestMapping("account")
 public class AccountRestController {
 	
 	BCryptPasswordEncoder hasher = new BCryptPasswordEncoder();

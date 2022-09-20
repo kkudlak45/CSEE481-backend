@@ -20,6 +20,7 @@ dependencies {
 	implementation 'io.github.cdimascio:dotenv-java:2.2.2'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.postgresql:postgresql'
+	testImplementation "org.testcontainers:postgresql:1.17.3"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
