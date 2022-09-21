@@ -4,19 +4,19 @@ import java.time.LocalDate;
 
 public class Deck {
 
-	private int id;
+	private Integer id;
 	private String name;
 	private LocalDate creationDate;
 	private LocalDate lastUsed;
-	private int accountId;
+	private Integer accountId;
 	
 	public Deck() {}
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -44,11 +44,11 @@ public class Deck {
 		this.lastUsed = lastUsed;
 	}
 
-	public int getAccountId() {
+	public Integer getAccountId() {
 		return accountId;
 	}
 
-	public void setAccountId(int accountId) {
+	public void setAccountId(Integer accountId) {
 		this.accountId = accountId;
 	}
 	

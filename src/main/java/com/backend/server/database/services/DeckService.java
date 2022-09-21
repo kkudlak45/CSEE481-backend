@@ -33,6 +33,7 @@ public class DeckService {
 				deck.setName(rs.getString(2));
 				deck.setCreationDate(GeneralUtils.toLocalDate(rs.getDate(3)));
 				deck.setLastUsed(GeneralUtils.toLocalDate(rs.getDate(4)));	
+				deck.setAccountId(accountId);
 				deckList.add(deck);
 			}
 					
@@ -100,6 +101,26 @@ public class DeckService {
 			createDeckStmt.setInt(1, deckId);
 			
 			return createDeckStmt.execute();
+		} catch (SQLException e) {
+			throw new DataServiceException(e);
+		}
+	}
+	
+	public static int update(final Deck deck) throws DataServiceException {
+		final String query = "UPDATE \"Deck\" "
+				+ "SET \"name\"=?, \"creationDate\"=?, \"lastUsed\"=?, \"accountId\"=? "
+				+ "WHERE \"id\"=?;";
+		
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement createDeckStmt = conn.prepareStatement(query)) {
+			
+			createDeckStmt.setString(1, deck.getName());
+			createDeckStmt.setObject(2, deck.getCreationDate());
+			createDeckStmt.setObject(3, deck.getLastUsed());
+			createDeckStmt.setInt(4, deck.getAccountId());
+			createDeckStmt.setInt(5, deck.getId());
+			
+			return createDeckStmt.executeUpdate();
 		} catch (SQLException e) {
 			throw new DataServiceException(e);
 		}
