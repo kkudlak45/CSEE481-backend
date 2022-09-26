@@ -10,6 +10,7 @@ import java.util.List;
 import com.backend.server.database.ConnectionManager;
 import com.backend.server.exception.DataServiceException;
 import com.backend.server.objects.CurveData;
+import com.backend.server.objects.PersonalData;
 
 public class CurveDataService {
 	
@@ -43,6 +44,32 @@ public class CurveDataService {
 		return dataList;
 	}
 	
+	public static CurveData getByAccountAndGameId(final int accountId, final int gameType) throws DataServiceException {
+		final String query = "SELECT \"id\", \"bestStat\", \"recentStat\" "
+				+ "FROM \"CurveData\" "
+				+ "WHERE \"gameType\"=? AND \"accountId\"=?;";
+		
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(query)) {
+			
+			stmt.setInt(1, gameType);
+			stmt.setInt(2, accountId);
+			ResultSet rs = stmt.executeQuery();
+			rs.next();
+			
+			CurveData data = new CurveData();
+			data.setId(rs.getInt(1));
+			data.setBestStat(rs.getDouble(2));
+			data.setRecentStat(rs.getDouble(3));
+			data.setAccountId(accountId);
+			data.setGameType(gameType);
+			
+			return data;	
+		} catch (SQLException e) {
+			throw new DataServiceException(e); // the reason im wrapping with a new exception is so i can use a try-with-resources block
+		}
+	}
+	
 	public static CurveData get(final int curveDataId) throws DataServiceException {
 		CurveData data = new CurveData();
 		
@@ -71,13 +98,13 @@ public class CurveDataService {
 
 	public static boolean create(CurveData curveData) throws DataServiceException {
 		String query = "INSERT INTO \"CurveData\""
-				+ "(\"id\", \"gameType\", \"bestStat\", \"recentStat\") "
+				+ "(\"accountId\", \"gameType\", \"bestStat\", \"recentStat\") "
 				+ "VALUES (?, ?, ?, ?)";
 		
 		try (Connection conn = ConnectionManager.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(query)) {
 			
-			stmt.setInt(1, curveData.getId());
+			stmt.setInt(1, curveData.getAccountId());
 			stmt.setInt(2, curveData.getGameType());
 			stmt.setDouble(3, curveData.getBestStat());
 			stmt.setDouble(4, curveData.getRecentStat());
@@ -86,6 +113,58 @@ public class CurveDataService {
 		} catch (SQLException e) {
 			throw new DataServiceException(e);
 		}
+	}
+	
+	public static int update(final CurveData curveData) throws DataServiceException {
+		final String query = "UPDATE \"CurveData\" "
+				+ "SET \"bestStat\"=?, \"recentStat\"=? "
+				+ "WHERE \"id\"=?;";
+	
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(query)) {
+			
+			stmt.setDouble(1, curveData.getBestStat());
+			stmt.setDouble(2, curveData.getRecentStat());
+			stmt.setInt(3, curveData.getId());
+			
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			throw new DataServiceException(e);
+		}
+	}
+	
+	/**
+	 * "Upserts" a CurveData. Right now, CurveData only supports "bestStat" and "recentStat", so this will
+	 * 	be used to update those properties based on a PersonalData being recorded. If a corresponding 
+	 * 	CurveData doesn't exist yet, it will be created (inserted) into the DB.
+	 * 
+	 * @param personalData
+	 * @return
+	 * @throws DataServiceException
+	 */
+	public static boolean upsert(PersonalData personalData) throws DataServiceException {
+		
+		CurveData curveData;
+		try {
+			curveData = getByAccountAndGameId(personalData.getAccountId(), personalData.getGameType());
+			
+		} catch (DataServiceException e) { // if curve data doesn't exist yet, make it.
+			curveData = new CurveData();
+			curveData.setAccountId(personalData.getAccountId());
+			curveData.setBestStat(personalData.getStat());
+			curveData.setRecentStat(personalData.getStat());
+			curveData.setGameType(personalData.getGameType());
+			
+			return create(curveData);
+		}
+		
+		// if curve data does exist, update it
+		if (curveData.getBestStat() < personalData.getStat()) { // if the new stat is better, overwrite best stat
+			curveData.setBestStat(personalData.getStat());
+		}
+		curveData.setRecentStat(personalData.getStat());
+		
+		return 1 == update(curveData);
 	}
 	
 }
