@@ -6,13 +6,13 @@
 	},
 	"item": [
 		{
-			"name": "Create Account Example",
+			"name": "Update Account",
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\":\"Kryzstof Kudlak\",\n    \"email\":\"example@example.com\",\n    \"username\":\"kkudlak45\",\n    \"password\":\"somePassword\"\n}",
+					"raw": "{\n    \"name\":\"Nate Arndt\",\n    \"email\":\"nsa@example.com\",\n    \"username\":\"nsawv\",\n    \"password\":\"password\",\n    \"joinDate\":\"2020-12-12\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -20,13 +20,41 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/createAccount",
+					"raw": "localhost:8080/account/27",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"createAccount"
+						"account",
+						"27"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Account",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Nate Arndt\",\n    \"email\":\"nsa@example.com\",\n    \"username\":\"nsawv\",\n    \"password\":\"password\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/account",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"account"
 					]
 				}
 			},
@@ -36,7 +64,14 @@
 			"name": "Verify Account Example",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "authorization",
+						"value": "MjAwODMwNzgzNzE0MjMwMjcy.GoeVqy.0EhVnVZLym8oi80NLGmDbNKjN1Dxwmgd4ILev0",
+						"type": "text",
+						"disabled": true
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"username\":\"kkudlak45\",\n    \"password\":\"somePassword\"\n}",
@@ -47,13 +82,291 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/verifyLogin",
+					"raw": "localhost:8080/account/verifyLogin",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
+						"account",
 						"verifyLogin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Stevens Nuts",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "Bot ",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://discord.com/api/v9/channels/1007366826319171604/messages?limit=50",
+					"protocol": "https",
+					"host": [
+						"discord",
+						"com"
+					],
+					"path": [
+						"api",
+						"v9",
+						"channels",
+						"1007366826319171604",
+						"messages"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "50"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Deck",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Deck 2\",\n    \"creationDate\":\"2020-12-19\",\n    \"lastUsed\":\"2020-12-20\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/account/25/deck",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"account",
+						"25",
+						"deck"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Card",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Steven\",\n    \"picture\":\"https://cog-web-app-public-assets.s3.amazonaws.com/Headshots/SAN.jpg\",\n    \"relationship\":\"mom\",\n    \"deckId\":4\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/deck/4/card",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"deck",
+						"4",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Deck",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Deck 2\",\n    \"creationDate\":\"2020-12-19\",\n    \"lastUsed\":\"2020-12-20\",\n    \"accountId\":25\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/account/24/deck/6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"account",
+						"24",
+						"deck",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Deck List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/account/25/deck",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"account",
+						"25",
+						"deck"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Deck",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/account/24/deck/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"account",
+						"24",
+						"deck",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Deck",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/account/24/deck/7",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"account",
+						"24",
+						"deck",
+						"7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Store Data Example",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"gameType\": 1,\n    \"stat\": 13.31\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/account/24/storeData",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"account",
+						"24",
+						"storeData"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/account/24/curveData/1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/account/24/curveData/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"account",
+						"24",
+						"curveData",
+						"1"
 					]
 				}
 			},

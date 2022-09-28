@@ -2,18 +2,18 @@ package com.backend.server.objects;
 
 public class Card {
 
-	private int id;
+	private Integer id;
 	private String name;
 	private String picture;
 	private String relationship;
-	private int deckId;
+	private Integer deckId;
 	
 	public Card() {}
 	
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 	
@@ -39,10 +39,10 @@ public class Card {
 		this.relationship = relationship;
 	}
 	
-	public int getDeckId() {
+	public Integer getDeckId() {
 		return deckId;
 	}
-	public void setDeckId(int deckId) {
+	public void setDeckId(Integer deckId) {
 		this.deckId = deckId;
 	}
 	

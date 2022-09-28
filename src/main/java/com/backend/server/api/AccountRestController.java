@@ -1,24 +1,20 @@
 package com.backend.server.api;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.server.database.ConnectionManager;
+import com.backend.server.database.services.AccountService;
+import com.backend.server.exception.DataServiceException;
 import com.backend.server.objects.Account;
-import com.backend.server.utils.GeneralUtils;
 
 /**
  * This REST controller handles stuff relating to Accounts. So far, this REST controller establishes
@@ -30,38 +26,16 @@ import com.backend.server.utils.GeneralUtils;
  * @author kudlakk
  */
 @RestController
-@RequestMapping("Account")
+@RequestMapping("account")
 public class AccountRestController {
-	
-	BCryptPasswordEncoder hasher = new BCryptPasswordEncoder();
 	
 	@GetMapping(path = "/{id}",
 			produces = "application/json")
 	public ResponseEntity<Account> getAccount(@PathVariable int id) {
-		
-		String query = "SELECT \"username\", \"picture\", \"name\", \"joinDate\", \"interests\", \"email\", \"birthDate\" "
-				+ "FROM \"Account\" "
-				+ "WHERE \"id\"=?;";
-		
-		try (Connection conn = ConnectionManager.getConnection();
-				PreparedStatement getAccStmt = conn.prepareStatement(query)) {
-			
-			getAccStmt.setInt(1, id);
-			ResultSet rs = getAccStmt.executeQuery();
-			rs.next();
-			
-			Account account = new Account();
-			account.setUsername(rs.getString(1));
-			account.setPicture(rs.getString(2));
-			account.setName(rs.getString(3));
-			account.setJoinDate(GeneralUtils.toLocalDate(rs.getDate(4)));
-			account.setInterests(rs.getString(5));
-			account.setEmail(rs.getString(6));
-			account.setBirthDate(GeneralUtils.toLocalDate(rs.getDate(7)));
-			
+		try {
+			Account account = AccountService.get(id);
 			return new ResponseEntity<>(account, HttpStatus.OK);
-					
-		} catch (SQLException e) {
+		} catch (DataServiceException e) {
 			System.err.println(e);
 			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
 		}
@@ -78,29 +52,39 @@ public class AccountRestController {
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<HttpStatus> createAccount(@RequestBody Account account) {
-		
-		String query = "INSERT INTO \"Account\""
-				+ "(\"name\", \"username\", \"password\", \"interests\", \"email\", \"birthDate\") \n"
-				+ "VALUES (?, ?, ?, ?, ?, ?);";
-		
-		try (Connection conn = ConnectionManager.getConnection();
-				PreparedStatement createAccStmt = conn.prepareStatement(query)) {
-			String hashedPassword = this.hasher.encode(account.getPassword());
-			
-			createAccStmt.setString(1, account.getName());
-			createAccStmt.setString(2, account.getUsername()); // TODO: in the DB, we should probably have a uniqueness constraint on this prop & we might want to return a response here that an acc with this user already exists
-			createAccStmt.setString(3, hashedPassword); // TODO: hash password before storing in db
-			createAccStmt.setString(4, account.getInterests());
-			createAccStmt.setString(5, account.getEmail()); // TODO: similarly to username, we probably want a uniqueness constraint here & will want a return code if an acc with this email exists
-			createAccStmt.setObject(6, account.getBirthDate());
-			
-			createAccStmt.execute();
-		} catch (SQLException e) {
+		try {
+			AccountService.create(account);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} catch (DataServiceException e) {
 			System.err.println(e);
 			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
 		}
-		
-		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+	
+	@PutMapping(path = "/{accountId}",
+			consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<HttpStatus> updateAccount(@PathVariable int accountId, @RequestBody Account account) {
+		try {
+			account.setId(accountId);
+			AccountService.update(account);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (DataServiceException e) {
+			System.err.println(e);
+			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+	}
+	
+	@DeleteMapping(path = "/{accountId}",
+			produces = "application/json")
+	ResponseEntity<HttpStatus> deleteCard(@PathVariable int accountId) {
+		try {
+			AccountService.delete(accountId);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (DataServiceException e) {
+			System.err.println(e);
+			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+		}
 	}
 	
 	/**
@@ -114,29 +98,9 @@ public class AccountRestController {
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Integer> verifyLogin(@RequestBody Account account) {
-		
-		String query = "SELECT \"password\", \"id\" "
-				+ "FROM \"Account\" "
-				+ "WHERE \"username\"=?;";
-		
-		try (Connection conn = ConnectionManager.getConnection();
-				PreparedStatement getAccStmt = conn.prepareStatement(query)) {
-			
-			getAccStmt.setString(1, account.getUsername());
-			ResultSet rs = getAccStmt.executeQuery();
-			
-			rs.next();
-			String hashedPassword = rs.getString(1);
-			int id = rs.getInt(2);
-			boolean doesMatch = this.hasher.matches(account.getPassword(), hashedPassword);
-			
-			if (doesMatch) {
-				return new ResponseEntity<>(id, HttpStatus.OK); 
-			}
-			else {
-				return new ResponseEntity<>(-1, HttpStatus.OK);
-			}
-		} catch (SQLException e) {
+		try {
+			return new ResponseEntity<>(AccountService.getIdFromLogin(account), HttpStatus.OK);
+		} catch (DataServiceException e) {
 			System.err.println(e);
 			return new ResponseEntity<>(-1, HttpStatus.UNPROCESSABLE_ENTITY);
 		}
