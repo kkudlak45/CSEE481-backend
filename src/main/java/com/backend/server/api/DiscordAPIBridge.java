@@ -14,14 +14,11 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
 @RestController
 @RequestMapping("discord")
 public class DiscordAPIBridge {
 	
-	private static final Dotenv ENV = Dotenv.load();
-	private static final String DISCORD_TOKEN = ENV.get("DISCORD_TOKEN");
+	private static final String DISCORD_TOKEN = System.getenv("DISCORD_TOKEN");
 	
 	@GetMapping(path = "/todos")
 	public ResponseEntity<String> getTodoMessages(@RequestParam Optional<Integer> limit) {

@@ -4,16 +4,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
 public class ConnectionManager {
-
-	private static final Dotenv ENV = Dotenv.load();
 	
-	public static final String HOST     = ENV.get("HOST");
-	public static final String PORT     = ENV.get("PORT");
-	public static final String DATABASE = ENV.get("DATABASE");
+	public static final String HOST     = System.getenv("HOST");
+	public static final String PORT     = System.getenv("PORT");
+	public static final String DATABASE = System.getenv("DATABASE");
 	public static final String JDBC_URL = String.format("jdbc:postgresql://%s:%s/%s", HOST, PORT, DATABASE);
+	
+	public static final String USER     = System.getenv("DB_USER");
+	public static final String PASSWORD = System.getenv("DB_PASS");
 	
 	/**
 	 * Establishes a connection to a postgresql database
@@ -30,7 +29,7 @@ public class ConnectionManager {
 		Connection conn = null;
 		
 		try {
-			conn = DriverManager.getConnection(JDBC_URL, ENV.get("DB_USER"), ENV.get("DB_PASS"));
+			conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
