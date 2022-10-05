@@ -8,6 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 public class BackendApplication {
+	
+	public static final String ALLOWED_CORS_HOST = System.getenv("ALLOWED_CORS_HOST");
 
 	public static void main(String[] args) {
 		SpringApplication.run(BackendApplication.class, args);
@@ -18,7 +20,7 @@ public class BackendApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/*/**").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/*/**").allowedOrigins(ALLOWED_CORS_HOST);
 			}
 		};
 	}
