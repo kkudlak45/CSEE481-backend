@@ -33,6 +33,17 @@ public class GameDataRestController {
 		}
 	}
 	
+	@GetMapping(path = "/personalData/{gameType}",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<PersonalData>> getPersonalDataGivenGameType(@PathVariable int accountId, @PathVariable int gameType) {
+		try {
+			return new ResponseEntity<>(PersonalDataService.getByAccountAndGameId(accountId, gameType), HttpStatus.OK);
+		} catch (DataServiceException e) {
+			System.err.println(e);
+			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+	}
+	
 	@GetMapping(path = "/curveData/{gameType}",
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<CurveData> getCurveDataGivenGameType(@PathVariable int accountId, @PathVariable int gameType) {

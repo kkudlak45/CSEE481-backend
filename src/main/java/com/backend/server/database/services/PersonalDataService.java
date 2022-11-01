@@ -13,6 +13,36 @@ import com.backend.server.objects.PersonalData;
 
 public class PersonalDataService {
 	
+	public static List<PersonalData> getByAccountAndGameId(final int accountId, final int gameType) throws DataServiceException {
+		List<PersonalData> dataList = new LinkedList<>();
+		
+		final String query = "SELECT \"id\", \"gameType\", \"stat\" "
+				+ "FROM \"PersonalData\" "
+				+ "WHERE \"accountId\"=? AND \"gameType\"=?;";
+		
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(query)) {
+			
+			stmt.setInt(1, accountId);
+			stmt.setInt(2, gameType);
+			ResultSet rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				PersonalData data = new PersonalData();
+				data.setId(rs.getInt(1));
+				data.setGameType(rs.getInt(2));
+				data.setStat(rs.getDouble(3));
+				data.setAccountId(accountId);
+				dataList.add(data);
+			}
+					
+		} catch (SQLException e) {
+			throw new DataServiceException(e); // the reason im wrapping with a new exception is so i can use a try-with-resources block
+		}
+		
+		return dataList;
+	}
+	
 	public static List<PersonalData> getByAccountId(final int accountId) throws DataServiceException {
 		List<PersonalData> dataList = new LinkedList<>();
 		
