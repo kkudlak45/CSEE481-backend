@@ -105,6 +105,21 @@ public class CardService {
 		}
 	}
 	
+	public static boolean deleteByDeckId(final int deckId) throws DataServiceException {
+		final String query = "DELETE FROM \"Card\" "
+				+ "WHERE \"deckId\"=?;";
+		
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(query)) {
+			
+			stmt.setInt(1, deckId);
+			
+			return stmt.execute();
+		} catch (SQLException e) {
+			throw new DataServiceException(e);
+		}
+	}
+	
 	public static int update(final Card card) throws DataServiceException {
 		final String query = "UPDATE \"Card\" "
 				+ "SET \"name\"=?, \"picture\"=?, \"relationship\"=?, \"deckId\"=? "

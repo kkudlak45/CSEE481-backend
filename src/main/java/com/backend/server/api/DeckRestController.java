@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backend.server.database.services.CardService;
 import com.backend.server.database.services.DeckService;
 import com.backend.server.exception.DataServiceException;
 import com.backend.server.objects.Deck;
@@ -69,6 +70,7 @@ public class DeckRestController {
 			produces = "application/json")
 	ResponseEntity<HttpStatus> deleteDeck(@PathVariable int accountId, @PathVariable int deckId) {
 		try {
+			CardService.deleteByDeckId(deckId);
 			DeckService.delete(deckId);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (DataServiceException e) {
