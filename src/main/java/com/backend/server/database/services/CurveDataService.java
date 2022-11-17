@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.backend.server.constants.GameTypeConstants;
 import com.backend.server.database.ConnectionManager;
 import com.backend.server.exception.DataServiceException;
 import com.backend.server.objects.CurveData;
@@ -159,12 +160,70 @@ public class CurveDataService {
 		}
 		
 		// if curve data does exist, update it
-		if (curveData.getBestStat() < personalData.getStat()) { // if the new stat is better, overwrite best stat
+		if (
+			personalData.getGameType() == GameTypeConstants.MEMORY_GAME
+			|| personalData.getGameType() == GameTypeConstants.COLOR_GAME
+			&& curveData.getBestStat() < personalData.getStat() // if the new stat is higher, overwrite best stat
+		) {
+			curveData.setBestStat(personalData.getStat());
+		}
+		else if (
+			personalData.getGameType() == GameTypeConstants.SLIDING_PUZZLE_GAME
+			|| personalData.getGameType() == GameTypeConstants.REACTION_GAME
+			&& curveData.getBestStat() > personalData.getStat() // if the new stat is lower, overwrite best stat
+		) {
 			curveData.setBestStat(personalData.getStat());
 		}
 		curveData.setRecentStat(personalData.getStat());
 		
 		return 1 == update(curveData);
+	}
+	
+	public static Double getPercentile(final int accountId, final int gameType) throws DataServiceException {
+		List<CurveData> dataList = new LinkedList<>();
+		
+		String orderType = "";
+		if (
+			gameType == GameTypeConstants.MEMORY_GAME
+			|| gameType == GameTypeConstants.COLOR_GAME
+		) {
+			orderType = " ASC";
+		}
+		else if (
+			gameType == GameTypeConstants.SLIDING_PUZZLE_GAME
+			|| gameType == GameTypeConstants.REACTION_GAME
+		) {
+			orderType = " DESC";
+		}
+		
+		
+		final String query = "SELECT \"accountId\", \"bestStat\" FROM \"CurveData\" "
+				+ "WHERE \"gameType\"=? "
+				+ "ORDER BY \"bestStat\"" + orderType + ";";
+		
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(query)) {
+			
+			stmt.setInt(1, gameType);
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+				CurveData data = new CurveData();
+				data.setAccountId(rs.getInt(1));
+				data.setBestStat(rs.getDouble(2));
+				dataList.add(data);
+			}
+			
+			for (int i = 0; i < dataList.size(); i++) {
+				if (dataList.get(i).getAccountId() == accountId) {
+					return (i+1d)/dataList.size() * 100;
+				}
+			}
+			
+			return -1d;	
+		} catch (SQLException e) {
+			throw new DataServiceException(e); // the reason im wrapping with a new exception is so i can use a try-with-resources block
+		}
 	}
 	
 }

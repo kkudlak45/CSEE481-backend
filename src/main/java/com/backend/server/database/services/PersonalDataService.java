@@ -72,6 +72,25 @@ public class PersonalDataService {
 		return dataList;
 	}
 	
+	public static double getStatAverage(final int accountId, final int gameType) throws DataServiceException {
+		final String query = "SELECT AVG(stat) "
+				+ "FROM \"PersonalData\" "
+				+ "WHERE \"accountId\"=? AND \"gameType\"=?;";
+		
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(query)) {
+			
+			stmt.setInt(1, accountId);
+			stmt.setInt(2, gameType);
+			ResultSet rs = stmt.executeQuery();
+			rs.next();
+			
+			return rs.getDouble(gameType);			
+		} catch (SQLException e) {
+			throw new DataServiceException(e);
+		}
+	}
+	
 	public static PersonalData get(final int personalDataId) throws DataServiceException {
 		PersonalData data = new PersonalData();
 		

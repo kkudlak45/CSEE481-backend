@@ -44,11 +44,34 @@ public class GameDataRestController {
 		}
 	}
 	
+
+	@GetMapping(path = "/personalData/{gameType}/average",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Double> getStatAverage(@PathVariable int accountId, @PathVariable int gameType) {
+		try {
+			return new ResponseEntity<>(PersonalDataService.getStatAverage(accountId, gameType), HttpStatus.OK);
+		} catch (DataServiceException e) {
+			System.err.println(e);
+			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+	}
+	
 	@GetMapping(path = "/curveData/{gameType}",
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<CurveData> getCurveDataGivenGameType(@PathVariable int accountId, @PathVariable int gameType) {
 		try {
 			return new ResponseEntity<>(CurveDataService.getByAccountAndGameId(accountId, gameType), HttpStatus.OK);
+		} catch (DataServiceException e) {
+			System.err.println(e);
+			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+	}
+	
+	@GetMapping(path = "/curveData/{gameType}/percentile",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Double> getPercentile(@PathVariable int accountId, @PathVariable int gameType) {
+		try {
+			return new ResponseEntity<>(CurveDataService.getPercentile(accountId, gameType), HttpStatus.OK);
 		} catch (DataServiceException e) {
 			System.err.println(e);
 			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
