@@ -85,7 +85,7 @@ public class PersonalDataService {
 			ResultSet rs = stmt.executeQuery();
 			rs.next();
 			
-			return rs.getDouble(gameType);			
+			return rs.getDouble(1);			
 		} catch (SQLException e) {
 			throw new DataServiceException(e);
 		}
