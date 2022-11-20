@@ -161,15 +161,15 @@ public class CurveDataService {
 		
 		// if curve data does exist, update it
 		if (
-			personalData.getGameType() == GameTypeConstants.MEMORY_GAME
-			|| personalData.getGameType() == GameTypeConstants.COLOR_GAME
+			(personalData.getGameType() == GameTypeConstants.MEMORY_GAME
+			|| personalData.getGameType() == GameTypeConstants.COLOR_GAME)
 			&& curveData.getBestStat() < personalData.getStat() // if the new stat is higher, overwrite best stat
 		) {
 			curveData.setBestStat(personalData.getStat());
 		}
 		else if (
-			personalData.getGameType() == GameTypeConstants.SLIDING_PUZZLE_GAME
-			|| personalData.getGameType() == GameTypeConstants.REACTION_GAME
+			(personalData.getGameType() == GameTypeConstants.SLIDING_PUZZLE_GAME
+			|| personalData.getGameType() == GameTypeConstants.REACTION_GAME)
 			&& curveData.getBestStat() > personalData.getStat() // if the new stat is lower, overwrite best stat
 		) {
 			curveData.setBestStat(personalData.getStat());
