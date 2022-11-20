@@ -47,8 +47,8 @@ public class AccountService {
 	
 	public static boolean create(final Account account) throws DataServiceException {
 		final String query = "INSERT INTO \"Account\""
-				+ "(\"name\", \"username\", \"password\", \"interests\", \"email\", \"birthDate\") \n"
-				+ "VALUES (?, ?, ?, ?, ?, ?);";
+				+ "(\"name\", \"username\", \"password\", \"interests\", \"email\", \"birthDate\", \"picture\") \n"
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?);";
 		
 		try (Connection conn = ConnectionManager.getConnection();
 				PreparedStatement createAccStmt = conn.prepareStatement(query)) {
@@ -60,6 +60,7 @@ public class AccountService {
 			createAccStmt.setString(4, account.getInterests());
 			createAccStmt.setString(5, account.getEmail()); // TODO: similarly to username, we probably want a uniqueness constraint here & will want a return code if an acc with this email exists
 			createAccStmt.setObject(6, account.getBirthDate());
+			createAccStmt.setString(7, account.getPicture());
 			
 			return createAccStmt.execute();
 		} catch (SQLException e) {
@@ -70,22 +71,17 @@ public class AccountService {
 	
 	public static int update(final Account account) throws DataServiceException {
 		final String query = "UPDATE \"Account\" "
-				+ "SET \"username\"=?, \"picture\"=?, \"password\"=?, \"name\"=?, \"joinDate\"=?, \"interests\"=?, \"email\"=?, \"birthDate\"=? "
+				+ "SET \"picture\"=?, \"name\"=?, \"interests\"=?, \"birthDate\"=? "
 				+ "WHERE \"id\"=?;";
 	
 		try (Connection conn = ConnectionManager.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(query)) {
 
-			String hashedPassword = HASHER.encode(account.getPassword());
-			stmt.setString(1, account.getUsername());
-			stmt.setString(2, account.getPicture());
-			stmt.setString(3, hashedPassword);
-			stmt.setString(4, account.getName());
-			stmt.setObject(5, account.getJoinDate());
-			stmt.setString(6, account.getInterests());
-			stmt.setString(7, account.getEmail());
-			stmt.setObject(8, account.getBirthDate());
-			stmt.setInt(9, account.getId());
+			stmt.setString(1, account.getPicture());
+			stmt.setString(2, account.getName());
+			stmt.setString(3, account.getInterests());
+			stmt.setObject(4, account.getBirthDate());
+			stmt.setInt(5, account.getId());
 			
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
